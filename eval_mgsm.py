@@ -4,14 +4,12 @@ import argparse
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import datasets
 
-
 def extract_regex(text):
     num_list = re.findall(r'\d+', text)
     if num_list is not None:
         return num_list
     else:
         return None
-
 
 def score_mgsm(pred, answer_number) -> bool:
     if "." in pred:
@@ -21,7 +19,6 @@ def score_mgsm(pred, answer_number) -> bool:
         return 1
     else:
         return 0
-
 
 def main(args):
     df = datasets.load_dataset("juletxara/mgsm", "ja")
@@ -33,7 +30,7 @@ def main(args):
     cnt = 0
     for i in range(len(df)):
         question = df["question"][i]
-        prompt = f"次の数学の問題を解いてください。最終的な答えを出す前に、解答の推論過程を記述してください。答えには整数の答え以外何も追加しないでください。\n問題:{question}\n答え:"
+        prompt = f"Please solve the following math problem. Describe the reasoning process of the solution before giving the final answer. In the answer, include only the integer answer without any additional text.\nProblem:{question}\nAnswer:"
         inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
         tokens = model.generate(
             **inputs,
@@ -51,7 +48,6 @@ def main(args):
         cnt += score
         print(i)
     print(cnt/len(df))        
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
